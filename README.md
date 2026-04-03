@@ -3,7 +3,7 @@
 This example allows the user to grow cacti 🌵  by tapping or clicking the ground. Showcases raycasting,
 spawning new objects, and importing a 3D model.
 
-![](./src/assets/preview.gif)
+![](https://i.giphy.com/media/rAi32DNlsWNpItOpDr/giphy.gif)
 
 ## Usage
 
@@ -17,6 +17,29 @@ spawning new objects, and importing a 3D model.
 ## Questions?
 
 Please raise any questions on [Github Discussions](https://github.com/orgs/8thwall/discussions) or join the [Discord](https://8th.io/discord) to connect with the community.
+
+## Deploy To Vercel
+
+This project is configured for static deployment on Vercel.
+
+1. Install dependencies: `npm install`
+2. Build locally (recommended): `npm run build`
+3. Push to your Git provider and import the repository into Vercel
+4. Deploy with default settings (the repo includes `vercel.json`)
+
+Local Vercel CLI flow (optional):
+
+1. `npm i -g vercel`
+2. `vercel login`
+3. `vercel --prod`
+
+### What Is Optimized
+
+- Production builds are generated into `dist` with automatic clean output.
+- Stable webpack module/chunk IDs reduce unnecessary bundle churn between deploys.
+- `external` static files are served with long-lived immutable cache headers.
+- Runtime model/texture assets can be hosted remotely (e.g., S3 URLs in `index.html`).
+- `index.html` remains revalidated so updates are picked up quickly.
 
 ---
 

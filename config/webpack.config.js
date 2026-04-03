@@ -39,12 +39,6 @@ const makeSassLoader = () => ({
   use: ['style-loader', 'css-loader', 'sass-loader'],
 })
 
-const makeAssetLoader = () => ({
-  test: /\..*$/,
-  include: [path.join(srcPath, 'assets')],
-  loader: path.join(__dirname, 'asset-loader.js'),
-})
-
 const makeDefaultHtmlLoader = () => ({
   test: /\.html$/,
   use: {
@@ -77,6 +71,7 @@ const config = {
     filename: 'bundle.js',
     path: distPath,
     publicPath: '/',
+    clean: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -89,11 +84,6 @@ const config = {
         {
           from: path.join(rootPath, 'external'),
           to: path.join(distPath, 'external'),
-          noErrorOnMissing: true,
-        },
-        {
-          from: path.join(srcPath, 'assets'),
-          to: path.join(distPath, 'assets'),
           noErrorOnMissing: true,
         },
         {
@@ -111,11 +101,18 @@ const config = {
       makeTsLoader(),
       makeCssLoader(),
       makeSassLoader(),
-      makeAssetLoader(),
       makeDefaultHtmlLoader(),
     ],
   },
+  optimization: {
+    moduleIds: 'deterministic',
+    chunkIds: 'deterministic',
+  },
+  performance: {
+    hints: false,
+  },
   mode: 'production',
+  devtool: false,
   context: srcPath,
   devServer: {
     open: false,
