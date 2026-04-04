@@ -49,6 +49,13 @@ export const tapPlaceComponent = {
 
     this.popup.classList.add('hidden')
   },
+  onCactusSelected(event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault()
+    }
+
+    this.showPopup()
+  },
   spawnCactusAroundUser() {
     if (!this.camera) {
       return
@@ -79,8 +86,11 @@ export const tapPlaceComponent = {
     newElement.setAttribute('gltf-model', '#cactusModel')
     newElement.setAttribute('class', 'cantap cactus')
 
-    newElement.addEventListener('click', () => {
-      this.showPopup()
+    newElement.addEventListener('click', (event) => {
+      this.onCactusSelected(event)
+    })
+    newElement.addEventListener('touchstart', (event) => {
+      this.onCactusSelected(event)
     })
 
     this.el.sceneEl.appendChild(newElement)
