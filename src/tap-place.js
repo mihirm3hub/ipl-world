@@ -8,6 +8,14 @@ export const tapPlaceComponent = {
   init() {
     this.prompt = document.getElementById('promptText')
     this.camera = document.getElementById('camera')
+    this.popup = document.getElementById('cactusPopup')
+    this.popupOkBtn = document.getElementById('popupOkBtn')
+
+    this.hidePopup = this.hidePopup.bind(this)
+
+    if (this.popupOkBtn) {
+      this.popupOkBtn.addEventListener('click', this.hidePopup)
+    }
 
     if (this.prompt) {
       this.prompt.textContent = 'Spawning cacti every 5s'
@@ -22,6 +30,24 @@ export const tapPlaceComponent = {
       clearInterval(this.spawnIntervalId)
       this.spawnIntervalId = null
     }
+
+    if (this.popupOkBtn) {
+      this.popupOkBtn.removeEventListener('click', this.hidePopup)
+    }
+  },
+  showPopup() {
+    if (!this.popup) {
+      return
+    }
+
+    this.popup.classList.remove('hidden')
+  },
+  hidePopup() {
+    if (!this.popup) {
+      return
+    }
+
+    this.popup.classList.add('hidden')
   },
   spawnCactusAroundUser() {
     if (!this.camera) {
@@ -51,6 +77,12 @@ export const tapPlaceComponent = {
     })
 
     newElement.setAttribute('gltf-model', '#cactusModel')
+    newElement.setAttribute('class', 'cantap cactus')
+
+    newElement.addEventListener('click', () => {
+      this.showPopup()
+    })
+
     this.el.sceneEl.appendChild(newElement)
 
     newElement.addEventListener('model-loaded', () => {
