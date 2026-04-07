@@ -10,6 +10,7 @@ export const tapPlaceComponent = {
     this.camera = document.getElementById('camera')
     this.popup = document.getElementById('cactusPopup')
     this.popupOkBtn = document.getElementById('popupOkBtn')
+    this.selectedCactus = null
 
     this.hidePopup = this.hidePopup.bind(this)
 
@@ -48,11 +49,18 @@ export const tapPlaceComponent = {
     }
 
     this.popup.classList.add('hidden')
+
+    if (this.selectedCactus) {
+      this.selectedCactus.setAttribute('visible', 'false')
+      this.selectedCactus = null
+    }
   },
   onCactusSelected(event) {
     if (event && typeof event.preventDefault === 'function') {
       event.preventDefault()
     }
+
+    this.selectedCactus = event && event.currentTarget ? event.currentTarget : null
 
     this.showPopup()
   },
