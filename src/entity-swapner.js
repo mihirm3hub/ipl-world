@@ -50,7 +50,7 @@ export const entitySwapnerComponent = {
     this.idleSpawnIntervalId = window.setInterval(() => {
       console.log('[almond] idle spawn tick')
       this.spawnIdleAlmond()
-    }, 30000)
+    }, 3000)
 
     console.log('[bb] init: starting featured match streaming')
     this.startBallByBallStreaming()
@@ -138,17 +138,17 @@ export const entitySwapnerComponent = {
     try {
       if (this.prompt) this.prompt.textContent = 'Finding featured match…'
       console.log('[bb] fetching featured matchKey…')
-      const sel = await getFeaturedMatchSelection({"tournamentKey":"a-rz--cricket--bcci--iplt20--2026-ZGwl",now:new Date()})
+      const sel = await getFeaturedMatchSelection({ "tournamentKey": "a-rz--cricket--bcci--iplt20--2026-ZGwl", now: new Date() })
       const matchKey = sel?.matchKey || ''
       if (!matchKey) throw new Error('No upcoming/ongoing match found')
       this.bbMatchKey = matchKey
       this.bbMatchLabel = String(
         sel?.match?.short_name ||
-          sel?.match?.shortName ||
-          sel?.match?.name ||
-          sel?.match?.title ||
-          sel?.match?.match_name ||
-          '',
+        sel?.match?.shortName ||
+        sel?.match?.name ||
+        sel?.match?.title ||
+        sel?.match?.match_name ||
+        '',
       ).trim()
       if (!this.bbMatchLabel) this.bbMatchLabel = matchKey
       const status = String(sel?.status || '').toLowerCase()
@@ -174,7 +174,7 @@ export const entitySwapnerComponent = {
         this.bbStatusIntervalId = window.setInterval(async () => {
           try {
             console.log('[bb] status tick: re-checking featured match…')
-            const nextSel = await getFeaturedMatchSelection({"tournamentKey":"a-rz--cricket--bcci--iplt20--2026-ZGwl",now:new Date()})
+            const nextSel = await getFeaturedMatchSelection({ "tournamentKey": "a-rz--cricket--bcci--iplt20--2026-ZGwl", now: new Date() })
             const nextStatus = String(nextSel?.status || '').toLowerCase()
             console.log('[bb] status tick:', nextStatus)
             if (nextStatus !== 'not_started') {
@@ -395,11 +395,17 @@ export const entitySwapnerComponent = {
     const spawnX = cameraPosition.x + Math.cos(randomAngle) * randomDistance
     const spawnZ = cameraPosition.z + Math.sin(randomAngle) * randomDistance
 
-    const newElement = document.createElement('a-entity')
-    newElement.setAttribute('position', `${spawnX} 0.1 ${spawnZ}`)
+    const parentElement = document.createElement('a-entity')
+    parentElement.setAttribute('position', `${spawnX} 0.1 ${spawnZ}`)
+    parentElement.setAttribute('no-cull', '')
+    // parentElement.setAttribute('look-at', `[camera]`)
 
+    const newElement = document.createElement('a-entity')
+    // newElement.setAttribute('position', `${spawnX} 0.1 ${spawnZ}`)
+    newElement.setAttribute('look-at', `[camera]`)
     const randomYRotation = Math.random() * 360
-    newElement.setAttribute('rotation', `0 ${randomYRotation} 0`)
+    // newElement.setAttribute('rotation', `0 ${randomYRotation} 0`)
+    newElement.setAttribute('rotation', `0 0 0`)
 
     const randomScale = Math.floor(Math.random() * (Math.floor(this.data.max) - Math.ceil(this.data.min)) + Math.ceil(this.data.min))
 
@@ -421,15 +427,30 @@ export const entitySwapnerComponent = {
       this.onAlmondSelected(event)
     })
 
-    this.el.sceneEl.appendChild(newElement)
+    this.el.sceneEl.appendChild(parentElement)
+    parentElement.appendChild(newElement)
+
     newElement.insertAdjacentHTML('beforeend', `
+        <a-entity
+          id="sparkleVideo"
+          play-video="video: #sparkle-video; autoplay: true"
+          material="shader: chromakey; src: #sparkle-video; color: 0.1 0.1 0.1; side: double; depthTest: true;"
+          geometry="primitive: plane; height: 1.024 width: 1.024;"
+          scale=""
+          position="0 0 -0.2"
+          rotation="0 0 0">
+        </a-entity>
+      `)
+
+    parentElement.insertAdjacentHTML('beforeend', `
         <a-entity
           id="alphaVideo"
           play-video="video: #alpha-video; autoplay: true"
           material="shader: chromakey; src: #alpha-video; color: 0.1 0.1 0.1; side: double; depthTest: true;"
           geometry="primitive: plane; height: 1.024 width: 1.024;"
-          scale="2 1 2"
-          rotation="-90 0 0">
+          scale="4 4 4"
+          position="0 .4 0"
+          rotation="90 0 0">
         </a-entity>
       `)
 
