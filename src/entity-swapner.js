@@ -94,7 +94,7 @@ export const entitySwapnerComponent = {
     const spawnZ = cameraPosition.z + Math.sin(randomAngle) * randomDistance
 
     const newElement = document.createElement('a-entity')
-    newElement.setAttribute('position', `${spawnX} 0.03 ${spawnZ}`)
+    newElement.setAttribute('position', `${spawnX} 0.1 ${spawnZ}`)
 
     const randomYRotation = Math.random() * 360
     newElement.setAttribute('rotation', `0 ${randomYRotation} 0`)

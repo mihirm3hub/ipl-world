@@ -83,6 +83,11 @@ const config = {
           to: path.join(distPath, 'ring.mp4'),
           noErrorOnMissing: true,
         },
+        {
+          from: path.join(rootPath, 'logoM.png'),
+          to: path.join(distPath, 'logoM.png'),
+          noErrorOnMissing: true,
+        },
       ],
     }),
   ],
@@ -111,6 +116,10 @@ const config = {
     compress: true,
     hot: true,
     liveReload: false,
+    static: {
+      directory: rootPath,
+      watch: true,
+    },
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',

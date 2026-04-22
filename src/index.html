@@ -38,6 +38,12 @@
 <!-- Copyright (c) 2022 8th Wall, Inc. -->
 <!-- body.html is optional; elements will be added to your html body after app.js is loaded. -->
 
+<div id="loadingScreen" class="loading-screen" aria-live="polite" aria-busy="true">
+  <img class="loading-logo" src="./logoM.png" alt="Logo">
+  <div class="loading-spinner" aria-hidden="true"></div>
+  <p class="loading-label">Loading experience...</p>
+</div>
+
 <div class="over">
   <span id="promptText">Tap To Place Model</span>
 </div>
