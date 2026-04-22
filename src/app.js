@@ -6,5 +6,11 @@
 import './index.css'
 
 // Register custom A-Frame components in app.js before the scene in body.html has loaded.
-import {tapPlaceComponent} from './tap-place'
-AFRAME.registerComponent('tap-place', tapPlaceComponent)
+import {entitySwapnerComponent} from './entity-swapner'
+AFRAME.registerComponent('entity-swapner', entitySwapnerComponent)
+
+import {chromaKeyShader} from './chroma-key'
+AFRAME.registerShader('chromakey', chromaKeyShader)
+
+import {playVideoComponent} from './play-video'
+AFRAME.registerComponent('play-video', playVideoComponent)

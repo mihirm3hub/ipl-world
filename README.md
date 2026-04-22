@@ -1,7 +1,7 @@
 # A-Frame: World Effects
 
-This example allows the user to grow cacti 🌵  by tapping or clicking the ground. Showcases raycasting,
-spawning new objects, and importing a 3D model.
+This example spawns almonds around the user every 5 seconds and lets users interact with them in AR.
+It showcases object spawning, click/touch interaction handling, popup UI feedback, and importing a 3D model.
 
 ![](https://i.giphy.com/media/rAi32DNlsWNpItOpDr/giphy.gif)
 
@@ -69,4 +69,4 @@ The camera should NOT be at a height (Y) of zero. It must be set to a non-zero v
 
 #### Attribution
 
-Toon Cactus by [PolyChromic](https://skfb.ly/6Xvws)
+3D model attribution should reflect the almond asset currently used in the scene (`almond.glb`).

@@ -78,6 +78,11 @@ const config = {
           to: path.join(distPath, 'almond.glb'),
           noErrorOnMissing: true,
         },
+        {
+          from: path.join(rootPath, 'ring.mp4'),
+          to: path.join(distPath, 'ring.mp4'),
+          noErrorOnMissing: true,
+        },
       ],
     }),
   ],

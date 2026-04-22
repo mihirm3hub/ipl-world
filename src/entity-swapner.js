@@ -1,6 +1,6 @@
-// Component that places cacti where the ground is clicked
+// Component that spawns almond entities around the user
 
-export const tapPlaceComponent = {
+export const entitySwapnerComponent = {
   schema: {
     min: { default: 6 },
     max: { default: 10 },
@@ -8,9 +8,9 @@ export const tapPlaceComponent = {
   init() {
     this.prompt = document.getElementById('promptText')
     this.camera = document.getElementById('camera')
-    this.popup = document.getElementById('cactusPopup')
+    this.popup = document.getElementById('almondPopup')
     this.popupOkBtn = document.getElementById('popupOkBtn')
-    this.selectedCactus = null
+    this.selectedAlmond = null
 
     this.hidePopup = this.hidePopup.bind(this)
 
@@ -23,7 +23,7 @@ export const tapPlaceComponent = {
     }
 
     this.spawnIntervalId = setInterval(() => {
-      this.spawnCactusAroundUser()
+      this.spawnAlmondAroundUser()
     }, 5000)
   },
   remove() {
@@ -50,9 +50,9 @@ export const tapPlaceComponent = {
 
     this.popup.classList.add('hidden')
 
-    if (this.selectedCactus) {
-      const selectedElement = this.selectedCactus
-      this.selectedCactus = null
+    if (this.selectedAlmond) {
+      const selectedElement = this.selectedAlmond
+      this.selectedAlmond = null
 
       selectedElement.classList.remove('cantap')
       selectedElement.setAttribute('animation__shrink', {
@@ -66,22 +66,22 @@ export const tapPlaceComponent = {
         if (selectedElement.parentNode) {
           selectedElement.parentNode.removeChild(selectedElement)
         }
-      }, {once: true})
+      }, { once: true })
 
       return
     }
 
   },
-  onCactusSelected(event) {
+  onAlmondSelected(event) {
     if (event && typeof event.preventDefault === 'function') {
       event.preventDefault()
     }
 
-    this.selectedCactus = event && event.currentTarget ? event.currentTarget : null
+    this.selectedAlmond = event && event.currentTarget ? event.currentTarget : null
 
     this.showPopup()
   },
-  spawnCactusAroundUser() {
+  spawnAlmondAroundUser() {
     if (!this.camera) {
       return
     }
@@ -94,7 +94,7 @@ export const tapPlaceComponent = {
     const spawnZ = cameraPosition.z + Math.sin(randomAngle) * randomDistance
 
     const newElement = document.createElement('a-entity')
-    newElement.setAttribute('position', `${spawnX} 0.01 ${spawnZ}`)
+    newElement.setAttribute('position', `${spawnX} 0.03 ${spawnZ}`)
 
     const randomYRotation = Math.random() * 360
     newElement.setAttribute('rotation', `0 ${randomYRotation} 0`)
@@ -104,22 +104,32 @@ export const tapPlaceComponent = {
     newElement.setAttribute('visible', 'false')
     newElement.setAttribute('scale', '0.0001 0.0001 0.0001')
 
-    newElement.setAttribute('shadow', {
-      receive: false,
-    })
+    // newElement.setAttribute('shadow', {
+    //   receive: false,
+    // })
 
-    newElement.setAttribute('gltf-model', '#cactusModel')
+    newElement.setAttribute('gltf-model', '#almondModel')
 
 
 
     newElement.addEventListener('click', (event) => {
-      this.onCactusSelected(event)
+      this.onAlmondSelected(event)
     })
     newElement.addEventListener('touchstart', (event) => {
-      this.onCactusSelected(event)
+      this.onAlmondSelected(event)
     })
 
     this.el.sceneEl.appendChild(newElement)
+    newElement.insertAdjacentHTML('beforeend', `
+        <a-entity
+          id="alphaVideo"
+          play-video="video: #alpha-video; autoplay: true"
+          material="shader: chromakey; src: #alpha-video; color: 0.1 0.1 0.1; side: double; depthTest: true;"
+          geometry="primitive: plane; height: 1.024 width: 1.024;"
+          scale="2 1 2"
+          rotation="-90 0 0">
+        </a-entity>
+      `)
 
     newElement.addEventListener('model-loaded', () => {
       // Once the model is loaded, we are ready to show it popping in using an animation.
@@ -130,7 +140,7 @@ export const tapPlaceComponent = {
         easing: 'easeOutElastic',
         dur: 800,
       })
-      newElement.setAttribute('class', 'cantap cactus')
+      newElement.setAttribute('class', 'cantap almond')
       // newElement.setAttribute('xrextras-two-finger-rotate', '')
       // newElement.setAttribute('xrextras-pinch-scale', '')
     })
