@@ -20,6 +20,7 @@ export const entitySpawnerComponent = {
     this.camera = document.getElementById('camera')
     this.popup = document.getElementById('almondPopup')
     this.popupOkBtn = document.getElementById('popupOkBtn')
+    this.popupCloseBtn = document.getElementById('rewardClose')
     this.selectedAlmond = null
     this.bbIntervalId = null
     this.bbStatusIntervalId = null
@@ -39,6 +40,9 @@ export const entitySpawnerComponent = {
     if (this.popupOkBtn) {
       this.popupOkBtn.addEventListener('click', this.hidePopup)
     }
+    if (this.popupCloseBtn) {
+      this.popupCloseBtn.addEventListener('click', this.hidePopup)
+    }
 
     if (this.prompt) {
       this.prompt.textContent = 'Waiting for match events…'
@@ -51,7 +55,7 @@ export const entitySpawnerComponent = {
     this.idleSpawnIntervalId = window.setInterval(() => {
       console.log('[almond] idle spawn tick')
       this.spawnIdleAlmond()
-    }, 30000)
+    }, 3000)
 
     console.log('[bb] init: starting featured match streaming')
     this.startBallByBallStreaming()
@@ -350,6 +354,9 @@ export const entitySpawnerComponent = {
     if (this.popupOkBtn) {
       this.popupOkBtn.removeEventListener('click', this.hidePopup)
     }
+    if (this.popupCloseBtn) {
+      this.popupCloseBtn.removeEventListener('click', this.hidePopup)
+    }
 
     if (typeof window !== 'undefined' && typeof window.__cleanupAlmondSpawnKnob === 'function') {
       window.__cleanupAlmondSpawnKnob()
@@ -359,6 +366,14 @@ export const entitySpawnerComponent = {
   showPopup() {
     if (!this.popup) {
       return
+    }
+
+    this.popup.classList.remove('hidden')
+    this.popup.classList.add('active')
+  },
+  setRewardPopupContent(points) {
+    if (typeof window !== 'undefined' && typeof window.updateRewardPopupContent === 'function') {
+      window.updateRewardPopupContent(points)
     }
 
     this.popup.classList.remove('hidden')
@@ -390,6 +405,7 @@ export const entitySpawnerComponent = {
     }
 
     this.popup.classList.add('hidden')
+    this.popup.classList.remove('active')
 
     if (this.selectedAlmond) {
       const selectedElement = this.selectedAlmond
@@ -429,28 +445,18 @@ export const entitySpawnerComponent = {
     console.log('scored')
     // Award points immediately on tap (prevents "score not updating" if user doesn't hit OK).
     try {
+      const pts = this.resolveSelectedAlmondPoints()
       if (this.selectedAlmond && this.selectedAlmond.dataset) {
         if (this.selectedAlmond.dataset.claimed !== '1') {
-          const pts = this.resolveSelectedAlmondPoints()
           if (Number.isFinite(pts) && pts > 0) {
             this.selectedAlmond.dataset.claimed = '1'
             this.score += pts
             this.lastAwardedPoints = pts
             console.log('[score] +', pts, '=>', this.score)
             this.renderScore()
+            this.setRewardPopupContent(pts)
           }
         }
-      }
-    } catch (e) {
-      // ignore
-    }
-
-    // Update popup copy with points.
-    try {
-      const pts = this.resolveSelectedAlmondPoints()
-      const p = this.popup?.querySelector?.('.popup-card p')
-      if (p) {
-        p.textContent = pts ? `+${pts} points` : 'You clicked the almond successfully.'
       }
     } catch (e) {
       // ignore

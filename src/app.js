@@ -4,6 +4,7 @@
 // is loaded, and before body.html is loaded.
 
 import './index.css'
+import './main'
 
 AFRAME.registerComponent('no-cull', {
   init() {
