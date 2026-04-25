@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="./assets/images/favicon.ico" type="image/x-icon">
+
+    <!--=============== LINK TO EXTERNAL CSS ===============-->
+    <link rel="stylesheet" href="./assets/images/styles.css?ver=1.3">
+
+    <title>California Almonds | Superfood</title>
+
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+        <div class="main-wrapper blue-gradient-bg">
+            <div class="match-strip" aria-label="Match information">
+                <div class="match-strip__track">
+                    <span>80 match tickets to be won.</span>
+                    <span class="match-strip__divider" aria-hidden="true"></span>
+                    <span>game starts when the match begins.</span>
+                    <span>80 match tickets to be won.</span>
+                    <span class="match-strip__divider" aria-hidden="true"></span>
+                    <span>game starts when the match begins.</span>
+                </div>
+            </div>
+
+            <main class="screen-container">
+
+                <!-- Stadium Background Image -->
+                <img src="./assets/images/stadium-bg.png" alt="Stadium Background" class="stadium-bg">
+
+                <header class="menu-header">
+                    <img src="./assets/images/superfood-logo.png" class="main-logo"
+                        alt="California Almonds Superfood for a Super You">
+
+                    <!-- Hamburger -->
+                    <div class="hamburger" id="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </header>
+
+                <!-- MOBILE MENU START -->
+                <div class="mobile-menu" id="mobileMenu">
+                
+                    <!-- Background -->
+                    <img src="./assets/images/offcanvas-stadium-bg.png" class="menu-bg" alt="Stadium Background">
+                
+                    <!-- Close -->
+                    <div class="menu-close" id="menuClose">✕</div>
+                
+                    <!-- Menu Items -->
+                    <div class="menu-content">
+                
+                        <a href="profile.html" class="menu-item">
+                            <img src="./assets/images/profile-icon.png" alt="Profile Icon">
+                            <span>PROFILE</span>
+                        </a>
+                
+                        <a href="how-to-play.html" class="menu-item">
+                            <img src="./assets/images/how-to-play-icon.png" alt="How to play Icon">
+                            <span>HOW TO PLAY</span>
+                        </a>
+                
+                        <a href="benefits.html" class="menu-item">
+                            <img src="./assets/images/benefits-icon.png" alt="Benefits Icon">
+                            <span>BENEFITS COLLECTION</span>
+                        </a>
+                
+                        <a href="winners.html" class="menu-item">
+                            <img src="./assets/images/winners-icon.png" alt="Winners Icon">
+                            <span>WINNERS</span>
+                        </a>
+                
+                        <a href="faqs.html" class="menu-item">
+                            <img src="./assets/images/faq-icon.png" alt="Faq Icon">
+                            <span>FAQS</span>
+                        </a>
+                
+                        <a href="terms.html" class="menu-item">
+                            <img src="./assets/images/terms-icon.png" alt="Terms Icon">
+                            <span>TERMS & CONDITIONS</span>
+                        </a>
+                
+                        <a href="contact.html" class="menu-item">
+                            <img src="./assets/images/contact-icon.png" alt="Contact Icon">
+                            <span>CONTACT US</span>
+                        </a>
+                
+                    </div>
+                
+                    <!-- Logout -->
+                    <div class="menu-logout">
+                        <img src="./assets/images/logout-icon.png">
+                        <span>LOGOUT</span>
+                    </div>
+                
+                </div>
+                <!-- MOBILE MENU END -->
+
+                <div class="main-content">
+                    <div class="missing-out-box">
+                        <div class="missing-content">
+                        
+                            <div class="missing-icon">
+                                <img src="./assets/images/bowl-icon.png" alt="Miss Icon">
+                            </div>
+                        
+                            <h2 class="missing-title">
+                                YOU'RE<br>
+                                <span>MISSING OUT!</span>
+                            </h2>
+                        
+                            <p class="missing-desc">
+                                Stay active to collect almond benefits and win match tickets.
+                            </p>
+                        
+                            <button class="missing-btn">
+                                <img src="./assets/images/missing-play-icon.png" alt="Play">
+                                RESUME PLAYING
+                            </button>
+                        
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-panel blue-footer-gradient">
+                    <footer class="page-footer">
+                        <p><a href="#">Privacy Policy</a> | <a href="#">Terms</a></p>
+                        <p>&copy; 2026 California Almonds. All rights reserved.</p>
+                    </footer>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const initHamburgerMenu = () => {
+            const hamburger = document.getElementById('hamburger')
+            const mobileMenu = document.getElementById('mobileMenu')
+
+            if (!hamburger || !mobileMenu) {
+                return
+            }
+
+            const openMenu = () => {
+                hamburger.classList.add('active')
+                mobileMenu.classList.add('active')
+                document.body.classList.add('menu-open')
+            }
+
+            const closeMenu = () => {
+                hamburger.classList.remove('active')
+                mobileMenu.classList.remove('active')
+                document.body.classList.remove('menu-open')
+            }
+
+            hamburger.addEventListener('click', (event) => {
+                event.stopPropagation()
+                if (mobileMenu.classList.contains('active')) {
+                    closeMenu()
+                } else {
+                    openMenu()
+                }
+            })
+
+            const menuClose = document.getElementById('menuClose')
+            if (menuClose) {
+                menuClose.addEventListener('click', closeMenu)
+            }
+
+            const menuLinks = mobileMenu.querySelectorAll('a')
+            menuLinks.forEach((link) => {
+                link.addEventListener('click', closeMenu)
+            })
+
+            document.addEventListener('click', (event) => {
+                if (
+                    mobileMenu.classList.contains('active') &&
+                    !mobileMenu.contains(event.target) &&
+                    !hamburger.contains(event.target)
+                ) {
+                    closeMenu()
+                }
+            })
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closeMenu()
+                }
+            })
+        }
+
+        document.addEventListener('DOMContentLoaded', initHamburgerMenu)
+    </script>
+</body>
+
+</html>

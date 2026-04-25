@@ -1,21 +1,6 @@
 import { benefitMessages } from './lib/benefitMessages'
 
-const unlockedBenefitsStorageKey = 'almondUnlockedBenefits'
 const rewardCycleStateStorageKey = 'almondRewardCycleState'
-const totalBenefitCount = 12
-const benefitCardCountsByKey = {
-  'WEIGHT MANAGEMENT': 1,
-  'GLOWING SKIN': 1,
-  'GUT HEALTH': 1,
-  IMMUNITY: 1,
-  'CALM NERVES': 1,
-  'BLOOD SUGAR CONTROL': 1,
-  'HEART HEALTH': 1,
-  'HAIR HEALTH': 1,
-  'MUSCLE STRENGTH': 1,
-  'BONE STRENGTH': 1,
-  'SUSTAINED ENERGY': 2,
-}
 
 const matchRewardMessages = [
   {
@@ -81,53 +66,6 @@ const normalizeBenefitKey = (value) =>
     .replace(/\s+unlocked$/i, '')
     .trim()
     .toUpperCase()
-
-const getUnlockedBenefitKeys = () => {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return []
-  }
-
-  try {
-    const raw = window.localStorage.getItem(unlockedBenefitsStorageKey)
-    const parsed = JSON.parse(raw || '[]')
-    return Array.isArray(parsed) ? parsed : []
-  } catch (error) {
-    return []
-  }
-}
-
-const saveUnlockedBenefitKey = (title) => {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return
-  }
-
-  const benefitKey = normalizeBenefitKey(title)
-  if (!benefitKey) {
-    return
-  }
-
-  const unlockedBenefitKeys = new Set(getUnlockedBenefitKeys())
-  unlockedBenefitKeys.add(benefitKey)
-  window.localStorage.setItem(
-    unlockedBenefitsStorageKey,
-    JSON.stringify([...unlockedBenefitKeys]),
-  )
-}
-
-const getCollectedBenefitCount = () =>
-  getUnlockedBenefitKeys().reduce((total, benefitKey) => {
-    const normalizedKey = normalizeBenefitKey(benefitKey)
-    return total + (benefitCardCountsByKey[normalizedKey] || 0)
-  }, 0)
-
-const updateBenefitCount = () => {
-  const benefitCountEl = document.getElementById('BenefitCount')
-  if (!benefitCountEl) {
-    return
-  }
-
-  benefitCountEl.textContent = `${getCollectedBenefitCount()}/${totalBenefitCount}`
-}
 
 const getRewardCycleState = () => {
   if (typeof window === 'undefined' || !window.localStorage) {
@@ -251,10 +189,6 @@ const initRewardPopupContent = () => {
       popupDesc.textContent = nextMessage.description
     }
 
-    if (nextMessage?.title) {
-      saveUnlockedBenefitKey(nextMessage.title)
-      updateBenefitCount()
-    }
   }
 }
 
@@ -314,9 +248,42 @@ const initHamburgerMenu = () => {
   })
 }
 
+const initMissingOutIdleRedirect = () => {
+  const idleMs = 5 * 60 * 1000
+  const redirectUrl = 'missing-out.html'
+  let idleTimerId = null
+
+  const redirectToMissingOut = () => {
+    window.location.href = redirectUrl
+  }
+
+  const resetIdleTimer = () => {
+    if (idleTimerId) {
+      window.clearTimeout(idleTimerId)
+    }
+
+    idleTimerId = window.setTimeout(redirectToMissingOut, idleMs)
+  }
+
+  const activityEvents = [
+    'click',
+    'keydown',
+    'mousemove',
+    'pointerdown',
+    'scroll',
+    'touchstart',
+  ]
+
+  activityEvents.forEach((eventName) => {
+    window.addEventListener(eventName, resetIdleTimer, {passive: true})
+  })
+
+  resetIdleTimer()
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   initLookAroundToggle()
   initRewardPopupContent()
-  updateBenefitCount()
   initHamburgerMenu()
+  initMissingOutIdleRedirect()
 })
