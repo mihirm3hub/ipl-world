@@ -407,11 +407,13 @@ export const entitySpawnerComponent = {
     this.popup.classList.add('active')
   },
   setRewardPopupContent(points) {
+    let unlockedBenefit = null
     if (typeof window !== 'undefined' && typeof window.updateRewardPopupContent === 'function') {
-      window.updateRewardPopupContent(points)
+      unlockedBenefit = window.updateRewardPopupContent(points)
     }
 
     this.popup.classList.remove('hidden')
+    return unlockedBenefit
   },
   resolveSelectedAlmondPoints() {
     if (!this.selectedAlmond || !this.selectedAlmond.dataset) {
@@ -489,24 +491,19 @@ export const entitySpawnerComponent = {
             this.lastAwardedPoints = pts
             console.log('[score] +', pts, '=>', this.score)
             this.renderScore()
-            this.setRewardPopupContent(pts)
+            const unlockedBenefit = this.setRewardPopupContent(pts)
           // Submit score to backend API
           // Assumes you have access to a JWT token in this.jwtToken, or replace as needed.
           this.jwtToken = sessionStorage.getItem('authToken') || ''
           if (!this.jwtToken) {
             console.warn("[api] JWT token not found; skipping score submission.");
-            return
           }
           const apiUrl = `${resolveApiBaseUrl()}/api/gameplay/progress/submit`;
-          const benefit = {
-            id: "benefit_heart_health",
-            benefit: "Heart Health"
-          };
           const payload = {
             pointsEarned: pts,
-            //here we can send benifits
+            ...(unlockedBenefit ? { benefit: unlockedBenefit } : {}),
           };
-
+          console.log('[api] submitting:', payload)
           if (this.jwtToken) {
             fetch(apiUrl, {
               method: "POST",

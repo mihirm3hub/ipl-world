@@ -8,7 +8,7 @@ const benefitCardCountsByKey = {
   'WEIGHT MANAGEMENT': 1,
   'GLOWING SKIN': 1,
   'GUT HEALTH': 1,
-  IMMUNITY: 1,
+  'IMMUNITY': 1,
   'CALM NERVES': 1,
   'BLOOD SUGAR CONTROL': 1,
   'HEART HEALTH': 1,
@@ -323,6 +323,16 @@ const initRewardPopupContent = () => {
       saveUnlockedBenefitKey(nextMessage.title)
       renderBenefitCount()
     }
+
+    const unlockedBenefit = nextMessage?.title
+      ? {
+          id: nextMessage.title,
+          benefit: nextMessage.description || '',
+        }
+      : null
+
+    window.almondLastUnlockedBenefit = unlockedBenefit
+    return unlockedBenefit
   }
 }
 
