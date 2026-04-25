@@ -1,8 +1,22 @@
 import { benefitMessages } from './lib/benefitMessages'
 import { resolveApiBaseUrl } from './lib/cricketApi'
 
+const unlockedBenefitsStorageKey = 'almondUnlockedBenefits'
 const rewardCycleStateStorageKey = 'almondRewardCycleState'
 const totalBenefitCount = 12
+const benefitCardCountsByKey = {
+  'WEIGHT MANAGEMENT': 1,
+  'GLOWING SKIN': 1,
+  'GUT HEALTH': 1,
+  IMMUNITY: 1,
+  'CALM NERVES': 1,
+  'BLOOD SUGAR CONTROL': 1,
+  'HEART HEALTH': 1,
+  'HAIR HEALTH': 1,
+  'MUSCLE STRENGTH': 1,
+  'BONE STRENGTH': 1,
+  'SUSTAINED ENERGY': 2,
+}
 const userDataApiEndpoint = `${resolveApiBaseUrl()}/api/user/userData`
 
 let weeklyPoints = 0
@@ -24,15 +38,54 @@ const normalizeBenefitKey = (value) =>
     .trim()
     .toUpperCase()
 
+const getUnlockedBenefitKeys = () => {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return []
+  }
+
+  try {
+    const raw = window.localStorage.getItem(unlockedBenefitsStorageKey)
+    const parsed = JSON.parse(raw || '[]')
+    return Array.isArray(parsed) ? parsed : []
+  } catch (error) {
+    return []
+  }
+}
+
+const saveUnlockedBenefitKey = (title) => {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return
+  }
+
+  const benefitKey = normalizeBenefitKey(title)
+  if (!benefitKey) {
+    return
+  }
+
+  const unlockedBenefitKeys = new Set(getUnlockedBenefitKeys())
+  unlockedBenefitKeys.add(benefitKey)
+  window.localStorage.setItem(
+    unlockedBenefitsStorageKey,
+    JSON.stringify([...unlockedBenefitKeys]),
+  )
+}
+
+const getCollectedBenefitCount = () =>
+  getUnlockedBenefitKeys().reduce((total, benefitKey) => {
+    const normalizedKey = normalizeBenefitKey(benefitKey)
+    return total + (benefitCardCountsByKey[normalizedKey] || 0)
+  }, 0)
+
 const renderBenefitCount = () => {
   const benefitCountEl = document.getElementById('BenefitCount')
   if (!benefitCountEl) {
     return
   }
 
+  const localBenefitCount = getCollectedBenefitCount()
   const safeBenefitCount = Math.min(
     totalBenefitCount,
-    Math.max(0, Number(unlockedBenefitsCount) || 0),
+    Math.max(0, Number(unlockedBenefitsCount) || 0, localBenefitCount),
   )
 
   benefitCountEl.textContent = `${safeBenefitCount}/${totalBenefitCount}`
@@ -266,6 +319,10 @@ const initRewardPopupContent = () => {
       popupDesc.textContent = nextMessage.description
     }
 
+    if (nextMessage?.title) {
+      saveUnlockedBenefitKey(nextMessage.title)
+      renderBenefitCount()
+    }
   }
 }
 
