@@ -1,6 +1,6 @@
 // Component that spawns almond entities around the user
 
-import { getBallByBall, getFeaturedMatchSelection } from './lib/cricketApi'
+import { getBallByBall, getFeaturedMatchSelection, resolveApiBaseUrl } from './lib/cricketApi'
 import {
   ballSignature,
   extractLatestBall,
@@ -490,6 +490,47 @@ export const entitySpawnerComponent = {
             console.log('[score] +', pts, '=>', this.score)
             this.renderScore()
             this.setRewardPopupContent(pts)
+          // Submit score to backend API
+          // Assumes you have access to a JWT token in this.jwtToken, or replace as needed.
+          this.jwtToken = sessionStorage.getItem('authToken') || ''
+          if (!this.jwtToken) {
+            console.warn("[api] JWT token not found; skipping score submission.");
+            return
+          }
+          const apiUrl = `${resolveApiBaseUrl()}api/gameplay/progress/submit`;
+          const benefit = {
+            id: "benefit_heart_health",
+            benefit: "Heart Health"
+          };
+          const payload = {
+            pointsEarned: pts,
+            //here we can send benifits
+          };
+
+          if (this.jwtToken) {
+            fetch(apiUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${this.jwtToken}`
+              },
+              body: JSON.stringify(payload)
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error("API submission failed");
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log("[api] Score submitted:", data);
+            })
+            .catch(err => {
+              console.warn("[api] Score submission error:", err);
+            });
+          } else {
+            console.warn("[api] JWT token not found; skipping score submission.");
+          }
           }
         }
       }

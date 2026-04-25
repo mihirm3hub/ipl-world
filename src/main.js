@@ -1,6 +1,49 @@
 import { benefitMessages } from './lib/benefitMessages'
 
 const rewardCycleStateStorageKey = 'almondRewardCycleState'
+const userDataApiEndpoint = `${resolveApiBaseUrl()}api/user/userData`
+
+let weeklyPoints = 0
+let overallPoints = 0
+let unlockedBenefitsCount = 0
+
+const fetchUserData = async () => {
+  const authToken = sessionStorage.getItem('authToken') || ''
+
+  if (!authToken) {
+    console.warn('authToken is missing in sessionStorage')
+    return null
+  }
+
+  try {
+    const response = await window.fetch(userDataApiEndpoint, {
+      method: 'GET',
+      headers: {
+        Accept: '*/*',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch userData: ${response.status}`)
+    }
+
+    const payload = await response.json()
+    const userData = payload?.data || {}
+
+    weeklyPoints = Number(userData.weeklyPoints) || 0
+    overallPoints = Number(userData.overallPoints) || 0
+    unlockedBenefitsCount = Array.isArray(userData.almondBenefitsUnlocked)
+      ? userData.almondBenefitsUnlocked.length
+      : 0
+
+    return userData
+  } catch (error) {
+    console.error('Error fetching userData', error)
+    return null
+  }
+}
 
 const matchRewardMessages = [
   {
@@ -315,4 +358,5 @@ window.addEventListener('DOMContentLoaded', () => {
   initRewardPopupContent()
   initHamburgerMenu()
   initIdleStateRedirect()
+  fetchUserData()
 })

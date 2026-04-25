@@ -1,17 +1,9 @@
-function resolveApiBaseUrl() {
-return "https://almond-ipl.vercel.app"
-}
-
-function resolveUrl(path) {
-  if (typeof path !== 'string') return String(path || '')
-  if (/^https?:\/\//i.test(path)) return path
-  const base = resolveApiBaseUrl()
-  if (!base) return path
-  return new URL(path, `${base}/`).toString()
+export function resolveApiBaseUrl() {
+return "https://api.almondwin.com"
 }
 
 async function apiFetch(path) {
-  const res = await fetch(resolveUrl(path))
+  const res = await fetch(`${resolveApiBaseUrl()}${path}`)
   const contentType = res.headers.get('content-type') || ''
   const data = contentType.includes('application/json')
     ? await res.json()
