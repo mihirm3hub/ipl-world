@@ -100,8 +100,8 @@ function statusString(m) {
     .toLowerCase()
 }
 
-function isCompletedMatch(m) {
-  const s = statusString(m)
+export function isCompletedMatchStatus(status) {
+  const s = String(status || '').trim().toLowerCase()
   if (!s) return false
   return (
     s.includes('complete') ||
@@ -113,6 +113,14 @@ function isCompletedMatch(m) {
     s.includes('no result') ||
     s.includes('postpon')
   )
+}
+
+export function getMatchStatusString(match) {
+  return statusString(match)
+}
+
+function isCompletedMatch(m) {
+  return isCompletedMatchStatus(statusString(m))
 }
 
 function extractStartTime(m) {

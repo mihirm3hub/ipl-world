@@ -7,6 +7,7 @@ import {
 
 const unlockedBenefitsStorageKey = 'almondUnlockedBenefits'
 const rewardCycleStateStorageKey = 'almondRewardCycleState'
+const gameEndSummaryStorageKey = 'almondGameEndSummary'
 const totalBenefitCount = 12
 const benefitCardCountsByKey = {
   'WEIGHT MANAGEMENT': 1,
@@ -124,6 +125,33 @@ const renderBenefitCount = () => {
   )
 
   benefitCountEl.textContent = `${safeBenefitCount}/${totalBenefitCount}`
+}
+
+const persistGameEndSummary = (summary = {}) => {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return
+  }
+
+  const normalizedSummary = {
+    pointsEarned: Math.max(
+      0,
+      Number(summary.pointsEarned ?? weeklyPoints) || 0,
+    ),
+    benefitsCollected: Math.min(
+      totalBenefitCount,
+      Math.max(
+        0,
+        Number(summary.benefitsCollected ?? getCollectedBenefitCount()) || 0,
+      ),
+    ),
+    totalBenefits: totalBenefitCount,
+    updatedAt: new Date().toISOString(),
+  }
+
+  window.localStorage.setItem(
+    gameEndSummaryStorageKey,
+    JSON.stringify(normalizedSummary),
+  )
 }
 
 const fetchUserData = async () => {
@@ -600,9 +628,57 @@ const initIdleStateRedirect = () => {
   resetIdleTimer()
 }
 
+const initGameEndRedirect = () => {
+  let resolvedSuperPath = null
+
+  const resolveSuperPath = async () => {
+    if (resolvedSuperPath) {
+      return resolvedSuperPath
+    }
+
+    const candidatePaths = [
+      'super.html',
+      '/super.html',
+      'dist/super.html',
+      '/dist/super.html',
+      'src/super.html',
+      '/src/super.html',
+    ]
+
+    for (const path of candidatePaths) {
+      try {
+        const response = await window.fetch(path, { method: 'GET', cache: 'no-store' })
+        if (response.ok) {
+          resolvedSuperPath = path
+          return resolvedSuperPath
+        }
+      } catch (error) {
+        // Try next candidate.
+      }
+    }
+
+    resolvedSuperPath = 'super.html'
+    return resolvedSuperPath
+  }
+
+  const goToGameEndScreen = async (summary = {}) => {
+    persistGameEndSummary(summary)
+    const targetPath = await resolveSuperPath()
+    console.log(`[game-end] redirecting to ${targetPath}`)
+    window.location.href = targetPath
+  }
+
+  window.showGameEndScreen = (summary = {}) => {
+    void goToGameEndScreen(summary)
+  }
+
+  console.log('[game-end] test helper ready: window.showGameEndScreen()')
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   renderWeeklyPoints()
   renderBenefitCount()
+  initGameEndRedirect()
   initLookAroundToggle()
   initRewardPopupContent()
   initMatchEventPopup()

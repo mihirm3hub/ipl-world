@@ -71,6 +71,11 @@ const config = {
       filename: 'missing-out.html',
       inject: false,
     }),
+    new HtmlWebpackPlugin({
+      template: path.join(srcPath, 'super.html'),
+      filename: 'super.html',
+      inject: false,
+    }),
     new CopyWebpackPlugin({
       patterns: [
         {
