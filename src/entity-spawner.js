@@ -1,6 +1,13 @@
 // Component that spawns almond entities around the user
 
-import { getBallByBall, getFeaturedMatchSelection, resolveApiBaseUrl } from './lib/cricketApi'
+import {
+  getBallByBall,
+  getFeaturedMatchSelection,
+  getMatch,
+  getMatchStatusString,
+  isCompletedMatchStatus,
+  resolveApiBaseUrl,
+} from './lib/cricketApi'
 import {
   ballSignature,
   extractLatestBall,
@@ -33,6 +40,7 @@ export const entitySpawnerComponent = {
     this.bbJson = null
     this.bbError = ''
     this.bbNotStarted = false
+    this.hasShownGameEndScreen = false
     this.isLiveMatchConnected = false
     this.score = 0
     this.lastAwardedPoints = 0
@@ -273,6 +281,7 @@ export const entitySpawnerComponent = {
       if (!this.bbMatchLabel) this.bbMatchLabel = matchKey
       const status = String(sel?.status || '').toLowerCase()
       this.bbNotStarted = status === 'not_started'
+      this.hasShownGameEndScreen = false
       console.log(
         '[bb] selected matchKey:',
         matchKey,
@@ -298,7 +307,13 @@ export const entitySpawnerComponent = {
             const nextSel = await getFeaturedMatchSelection({ "tournamentKey": "a-rz--cricket--bcci--iplt20--2026-ZGwl", now: new Date() })
             const nextStatus = String(nextSel?.status || '').toLowerCase()
             console.log('[bb] status tick:', nextStatus)
-            if (nextStatus !== 'not_started') {
+            if (isCompletedMatchStatus(nextStatus)) {
+              this.handleGameEndRedirect({
+                matchKey: nextSel?.matchKey || matchKey,
+                status: nextStatus,
+                source: 'status-poll',
+              })
+            } else if (nextStatus !== 'not_started') {
               console.log('[bb] match started (status changed); starting ball-by-ball')
               this.startBallByBallStreaming(pollMs)
             } else {
@@ -331,6 +346,17 @@ export const entitySpawnerComponent = {
     this.bbIntervalId = window.setInterval(async () => {
       try {
         console.log('[bb] polling tick: fetching ball-by-ball…')
+        const matchDetails = await getMatch(this.bbMatchKey)
+        const matchStatus = getMatchStatusString(matchDetails)
+        if (isCompletedMatchStatus(matchStatus)) {
+          this.handleGameEndRedirect({
+            matchKey: this.bbMatchKey,
+            status: matchStatus,
+            source: 'match-poll',
+          })
+          return
+        }
+
         const json = await getBallByBall(this.bbMatchKey)
         this.bbJson = json
         this.bbError = ''
@@ -344,6 +370,21 @@ export const entitySpawnerComponent = {
         this.renderBallByBallStatus()
       }
     }, pollMs)
+  },
+  handleGameEndRedirect({ matchKey = '', status = '', source = '' } = {}) {
+    if (this.hasShownGameEndScreen) {
+      return
+    }
+
+    this.hasShownGameEndScreen = true
+    this.stopBallByBallStreaming()
+    console.log('[game-end] active match completed', { matchKey, status, source })
+
+    if (typeof window !== 'undefined' && typeof window.showGameEndScreen === 'function') {
+      window.showGameEndScreen({
+        pointsEarned: this.score,
+      })
+    }
   },
   stopBallByBallStreaming() {
     if (this.bbIntervalId) {

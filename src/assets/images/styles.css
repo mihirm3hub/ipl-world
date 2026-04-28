@@ -434,10 +434,23 @@ ul {
 
 .match-strip__track {
     height: 100%;
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: tickerMove 12s linear infinite;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+}
+
+.match-strip__group {
+    height: 100%;
     display: inline-flex;
     align-items: center;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
     gap: 14px;
-    animation: tickerMove 12s linear infinite;
+    padding-right: 14px;
+    white-space: nowrap;
 }
 
 .match-strip__divider {
@@ -445,17 +458,17 @@ ul {
     height: 8px;
     flex: 0 0 auto;
     border-radius: 2px;
-    background: #e33a59;
-    box-shadow: inset 3px 0 0 rgba(255, 255, 255, 0.32), inset -3px 0 0 rgba(0, 0, 0, 0.16);
+    /* background: #e33a59;
+    box-shadow: inset 3px 0 0 rgba(255, 255, 255, 0.32), inset -3px 0 0 rgba(0, 0, 0, 0.16); */
 }
 
 @keyframes tickerMove {
     from {
-        transform: translateX(0);
+        transform: translate3d(0, 0, 0);
     }
 
     to {
-        transform: translateX(-50%);
+        transform: translate3d(-50%, 0, 0);
     }
 }
 
